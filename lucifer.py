@@ -1,32 +1,9 @@
 import curses
 
-import lights
+import lights, scenes
 
-scenes = list(lights.scenes.items())
-sceneNames = [scene.get("name") for sceneID, scene in scenes]
-sceneIdx = 0
-      
-def nextScene():
-  global sceneIdx
-  sceneIdx += 1
-  sceneIdx %= len(scenes)  
-  lights.set_scene(scenes[sceneIdx][0])
+import bindings
 
-def prevScene():
-  global sceneIdx
-  sceneIdx -= 1
-  sceneIdx %= len(scenes)  
-  lights.set_scene(scenes[sceneIdx][0])
-
-def resetScene():
-  global sceneIdx
-  lights.set_scene(scenes[sceneIdx][0])
-
-def setScene(sceneName):
-  global sceneIdx
-  idx = sceneNames.index(sceneName)
-  sceneIdx = idx
-  lights.set_scene(scenes[sceneIdx][0])
 
 def pad(name, width):
   name = str(name)
@@ -63,8 +40,8 @@ def main(stdscr):
 
     row += 2
 
-    for idx, sceneName in enumerate(sceneNames):
-    	stdscr.addstr(row + idx, 0, sceneName, curses.A_REVERSE if idx == sceneIdx else 0)
+    for idx, sceneName in enumerate(scenes.sceneNames):
+    	stdscr.addstr(row + idx, 0, sceneName, curses.A_REVERSE if idx == scenes.sceneIdx else 0)
 
     stdscr.refresh()
 
@@ -77,28 +54,10 @@ def main(stdscr):
     if key == ord('q'):
       return
 
-    if key == curses.KEY_DOWN:
-      nextScene()
-
-    if key == curses.KEY_UP:
-      prevScene()
-
-    if key == curses.KEY_LEFT:
-      lights.darken()
-   
-    if key == curses.KEY_RIGHT:
-      lights.lighten()
-    
-    if key == curses.KEY_HOME:
-      setScene("Evening reading")
-    
-    if key == ord('i'):
-      setScene("Daylight")
-   
-    if key == 0:
-      resetScene()
+    binding = bindings.BINDINGS.get(key)
+    if binding is not None:
+      binding()
  
-    if key == 10:
-      lights.toggle()
+ 
 
 curses.wrapper(main)
