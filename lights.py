@@ -22,9 +22,11 @@ for sceneID, scene in bridge.get_api()["scenes"].items():
     scenes[sceneID] = scene
 
 def getRooms():
+  rooms = []
   for room in bridge.groups:
     if "Entertainment area" not in room.name:
-       yield room
+       rooms.append(room)
+  return sorted(rooms, key=lambda room: room.name)
 
 def set_scene(scene_id):
   bridge.activate_scene(group_id=mainroom, scene_id=scene_id) 

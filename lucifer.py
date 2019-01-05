@@ -32,7 +32,7 @@ def main(stdscr):
 
     row = 2
     for room in lights.getRooms():
-        stdscr.addstr(row, 2, room.name)
+        stdscr.addstr(row, 2, room.name, curses.A_REVERSE if room.group_id == lights.mainroom else 0)
         row += 1
         for light in room.lights:
            stdscr.addstr(row, 4, describeLight(light))
@@ -51,13 +51,16 @@ def main(stdscr):
 
     lastKey = key
 
-    if key == ord('q'):
+    if key == 27:
       return
 
     binding = bindings.BINDINGS.get(key)
     if binding is not None:
       binding()
- 
+      continue
+
+    if key >= ord('a') and key <= ord('z'):
+      scenes.set_starting(key)
  
 
 curses.wrapper(main)

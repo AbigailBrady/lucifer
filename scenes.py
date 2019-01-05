@@ -26,3 +26,10 @@ def set_scene(sceneName):
   sceneIdx = idx
   lights.set_scene(scenes[sceneIdx][0])
 
+def set_starting(first_char):
+  for name in sceneNames[sceneIdx+1:] + sceneNames[0:sceneIdx]:
+    ch = ord(name.lower()[0])
+    if ch == first_char:
+      set_scene(name)
+      return
+
