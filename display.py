@@ -21,7 +21,7 @@ def describeLight(light):
   # + " h: " + pad(light.hue, 5) + " s: " + pad(light.saturation, 3)
   return pad(light.name, 20) + " [off]"
 
-def realpaint():
+def paint():
     if stdscr is None:
         return
     global lastKey
@@ -42,9 +42,5 @@ def realpaint():
     	stdscr.addstr(row + idx, 0, sceneName, curses.A_REVERSE if idx == scenes.sceneIdx else 0)
 
     stdscr.refresh()
-
-def paint():
-   import timeit
-   print(timeit.timeit(realpaint, number=1))
 
 
