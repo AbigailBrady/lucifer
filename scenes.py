@@ -14,11 +14,18 @@ def next_scene():
   sceneIdx %= len(scenes)  
   lights.set_scene(scenes[sceneIdx][0])
 
+def toggle_fav():
+  name = sceneNames[sceneIdx]
+  if name in sceneFav:
+    sceneFav.remove(name)
+  else:
+    sceneFav.append(name)  
+
 def prev_fav():
   global sceneIdx
   origIdx = sceneIdx
   while True: 
-    sceneIdx += 1
+    sceneIdx -= 1
     sceneIdx %= len(scenes)  
     if sceneNames[sceneIdx] in sceneFav:
       break
