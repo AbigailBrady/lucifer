@@ -18,7 +18,10 @@ def iteration(stdscr):
 
     binding = bindings.BINDINGS.get(key)
     if binding is not None:
-      binding()
+      if isinstance(binding, str):
+        scenes.set_scene(binding)
+      else:
+        binding()
       return
 
     if key >= ord('a') and key <= ord('z'):

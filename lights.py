@@ -26,7 +26,7 @@ def current_api():
 
 class Room:
   def __init__(self, id, name, lights):
-    self._id = id
+    self._id = int(id)
     self._name = name
     self._lights = lights
 
@@ -97,14 +97,17 @@ def set_scene(scene_id):
   bridge.activate_scene(group_id=mainroom, scene_id=scene_id) 
 
 def darken():
+  """darken lights in room"""
   room = getRoom(settings.MAIN_ROOM)
   room.brightness = max(room.brightness - settings.BRIGHTNESS_STEP, 0)
 
 def lighten():
+  """brighten lights in room"""
   room = getRoom(settings.MAIN_ROOM)
   room.brightness = min(room.brightness + settings.BRIGHTNESS_STEP, 255)
 
 def toggle():
+  """toggle room on/off"""
   room = getRoom(settings.MAIN_ROOM)
   room.on = not room.on
 

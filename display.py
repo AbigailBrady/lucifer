@@ -1,5 +1,4 @@
-import lights, scenes, curses
-
+import lights, scenes, curses, bindings, settings
 
 stdscr = None
 lastKey = 0
@@ -22,6 +21,13 @@ def describeLight(light):
   # + " h: " + pad(light.hue, 5) + " s: " + pad(light.saturation, 3)
   return pad(light.name, 20) + " [off]"
 
+def keyFor(scene_name):
+  for key, binding in bindings.BINDINGS.items():
+    if isinstance(binding, bindings.SceneSetter):
+      if binding.scene == scene_name:
+        return curses.keyname(key)
+  return ""
+
 def paint():
     if stdscr is None:
         return
@@ -33,15 +39,25 @@ def paint():
     for room in lights.getRooms():
         stdscr.addstr(row, 2, room.name, curses.A_REVERSE if room.group_id == lights.mainroom else 0)
         row += 1
-        for light in room.lights:
+        for light in room.lights: 
            stdscr.addstr(row, 4, describeLight(light))
            row += 1
 
-    row += 2
+    row += 1
 
     for idx, sceneName in enumerate(scenes.sceneNames):
-    	stdscr.addstr(row + idx, 0, "*" if scenes.is_fave(idx) else "")
-    	stdscr.addstr(row + idx, 2, sceneName, curses.A_REVERSE if idx == scenes.sceneIdx else 0)
+    	stdscr.addstr(row, 0, "*" if scenes.is_fave(idx) else "")
+    	stdscr.addstr(row, 2, sceneName, curses.A_REVERSE if idx == scenes.sceneIdx else 0)
+    	stdscr.addstr(row, 25, keyFor(sceneName))
+    	row += 1
+
+    row = 5
+
+    for key, binding in bindings.BINDINGS.items():
+       if not isinstance(binding, (str, bindings.SceneSetter)):
+               stdscr.addstr(row, 40, curses.keyname(key))
+               stdscr.addstr(row, 62, binding.__doc__ or "")
+               row += 1
 
     stdscr.refresh()
 
