@@ -1,6 +1,8 @@
-import curses, lights, scenes
+import curses, lights, scenes, sys
 
-BINDINGS = { curses.KEY_HOME : lambda: scenes.set_scene("Evening reading"),
+BINDINGS = { 27: sys.exit,
+
+             curses.KEY_HOME : lambda: scenes.set_scene("Evening reading"),
              ord('i') : lambda: scenes.set_scene("Daylight"),
 
 	     curses.KEY_DOWN: scenes.next_scene,
