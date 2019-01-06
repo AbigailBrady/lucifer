@@ -1,13 +1,41 @@
-import lights
+import lights, settings
 
 scenes = sorted(list(lights.scenes.items()), key=lambda s: s[1]["name"])
 sceneNames = [scene.get("name") for sceneID, scene in scenes]
 sceneIdx = 0
-      
+sceneFav = settings.FAVE_SCENES
+
+def is_fave(idx):
+  return sceneNames[idx] in sceneFav
+ 
 def next_scene():
   global sceneIdx
   sceneIdx += 1
   sceneIdx %= len(scenes)  
+  lights.set_scene(scenes[sceneIdx][0])
+
+def prev_fav():
+  global sceneIdx
+  origIdx = sceneIdx
+  while True: 
+    sceneIdx += 1
+    sceneIdx %= len(scenes)  
+    if sceneNames[sceneIdx] in sceneFav:
+      break
+    if sceneIdx == origIdx:
+      return
+  lights.set_scene(scenes[sceneIdx][0])
+
+def next_fav():
+  global sceneIdx
+  origIdx = sceneIdx
+  while True:
+    sceneIdx += 1
+    sceneIdx %= len(scenes)  
+    if sceneNames[sceneIdx] in sceneFav:
+      break
+    if sceneIdx == origIdx:
+      return
   lights.set_scene(scenes[sceneIdx][0])
 
 def prev_scene():

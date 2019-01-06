@@ -1,5 +1,6 @@
 import lights, scenes, curses
 
+
 stdscr = None
 lastKey = 0
 
@@ -39,7 +40,8 @@ def paint():
     row += 2
 
     for idx, sceneName in enumerate(scenes.sceneNames):
-    	stdscr.addstr(row + idx, 0, sceneName, curses.A_REVERSE if idx == scenes.sceneIdx else 0)
+    	stdscr.addstr(row + idx, 0, "*" if scenes.is_fave(idx) else "")
+    	stdscr.addstr(row + idx, 2, sceneName, curses.A_REVERSE if idx == scenes.sceneIdx else 0)
 
     stdscr.refresh()
 

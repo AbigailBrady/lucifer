@@ -10,8 +10,10 @@ BINDINGS = { 27: sys.exit,
 
              0: scenes.reset_scene, 
              
-             curses.KEY_LEFT: lights.darken,
-             curses.KEY_RIGHT: lights.lighten,
+             '-': lights.darken,
+             '=': lights.lighten,
+             curses.KEY_LEFT: scenes.prev_fav,
+             curses.KEY_RIGHT: scenes.next_fav,
              10: lights.toggle,
 
 }
