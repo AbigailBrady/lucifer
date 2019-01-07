@@ -29,11 +29,11 @@ def current_api() -> dict:
 
 class Light:
     def __init__(self, api: dict):
-        self._name: str = api["name"]
-        self._on: bool = api["state"]["on"]
-        self._brightness: int = api["state"]["bri"]
-        self._saturation: int = api["state"]["sat"]
-        self._hue: int = api["state"]["hue"]
+        self._name = api["name"]
+        self._on = api["state"]["on"]
+        self._brightness = api["state"]["bri"]
+        self._saturation = api["state"]["sat"]
+        self._hue = api["state"]["hue"]
 
     @property
     def on(self):
@@ -77,7 +77,7 @@ def getRooms() -> typing.List[Room]:
 
     api = current_api()
 
-    rooms: typing.List[Room] = []
+    rooms = []
 
     groups = api["groups"]
     for groupID, group in groups.items():
@@ -89,7 +89,7 @@ def getRooms() -> typing.List[Room]:
                 light = api["lights"][lightID]
                 roomlights.append(Light(light))
 
-        rooms.append(Room(groupID, name, roomlights))
+            rooms.append(Room(groupID, name, roomlights))
 
     rooms = sorted(rooms, key=lambda room: room.name)
 

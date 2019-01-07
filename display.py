@@ -1,4 +1,4 @@
-import lights, scenes, curses, bindings, settings, typing
+import lights, scenes, curses, bindings, presets, settings, typing, keynames
 
 stdscr = None
 lastKey = 0
@@ -23,9 +23,9 @@ def describeLight(light: lights.Light) -> str:
 
 def keyFor(scene_name: str) -> str:
     for key, binding in bindings.BINDINGS.items():
-        if isinstance(binding, bindings.RecallPreset):
+        if isinstance(binding, presets.RecallPreset):
             if binding.scene == scene_name:
-                return curses.keyname(key)
+                return keynames.keyname(key)
     return ""
 
 def paint() -> None:
@@ -54,8 +54,8 @@ def paint() -> None:
     row = 5
 
     for key, binding in bindings.BINDINGS.items():
-        if not isinstance(binding, (str, bindings.RecallPreset)):
-            stdscr.addstr(row, 40, curses.keyname(key))
+        if not isinstance(binding, (str, presets.RecallPreset)):
+            stdscr.addstr(row, 40, keynames.keyname(key))
             stdscr.addstr(row, 62, binding.__doc__ or "")
             row += 1
 

@@ -1,4 +1,4 @@
-import curses
+import curses, phue
 
 import lights, scenes
 
@@ -35,6 +35,8 @@ def main(stdscr):
     try:
       iteration(stdscr)
     except OSError as e:
+      pass
+    except phue.PhueRequestTimeout as e:
       pass
  
 curses.wrapper(main)
