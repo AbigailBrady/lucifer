@@ -13,7 +13,7 @@ def bright(value: int) -> str:
     value = round(value * 100 / 255)
     return pad(str(value) + "%", 4)
 
-def describeLight(light: lights.Light) -> str:
+def describe_light(light: lights.Light) -> str:
     if light.on:
         return pad(light.name, 20) + " b: " + bright(light.brightness)
 
@@ -21,7 +21,7 @@ def describeLight(light: lights.Light) -> str:
       # + " h: " + pad(light.hue, 5) + " s: " + pad(light.saturation, 3)
     return pad(light.name, 20) + " [off]"
 
-def keyFor(scene_name: str) -> str:
+def key_for(scene_name: str) -> str:
     for key, binding in bindings.BINDINGS.items():
         if isinstance(binding, presets.RecallPreset):
             if binding.scene == scene_name:
@@ -36,11 +36,11 @@ def paint() -> None:
     stdscr.clear()
     stdscr.addstr(0, 0, str(lastKey))
     row = 2
-    for room in lights.getRooms():
+    for room in lights.get_rooms():
         stdscr.addstr(row, 2, room.name, curses.A_REVERSE if room.group_id == lights.mainroom else 0)
         row += 1
         for light in room.lights: 
-            stdscr.addstr(row, 4, describeLight(light))
+            stdscr.addstr(row, 4, describe_light(light))
             row += 1
 
     row += 1
@@ -48,7 +48,7 @@ def paint() -> None:
     for idx, sceneName in enumerate(scenes.sceneNames):
         stdscr.addstr(row, 0, "*" if scenes.is_fave(idx) else "")
         stdscr.addstr(row, 2, sceneName, curses.A_REVERSE if idx == scenes.sceneIdx else 0)
-        stdscr.addstr(row, 25, keyFor(sceneName))
+        stdscr.addstr(row, 25, key_for(sceneName))
         row += 1
 
     row = 5

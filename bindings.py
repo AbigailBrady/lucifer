@@ -1,4 +1,5 @@
 import curses, lights, scenes, sys, settings, presets
+
 BINDINGS = { 27: lambda: sys.exit(0),
 
              curses.KEY_HOME : presets.RecallPreset(1),

@@ -6,19 +6,19 @@ bridge = phue.Bridge(settings.BRIDGE_IP)
 
 scenes = {}
 
-def findRoom(roomName: str) -> typing.Optional[int]:
+def find_room_id(roomName: str) -> typing.Optional[int]:
   for room in bridge.groups:
     if roomName == room.name:
       return room.group_id
   return None
 
-def getRoom(roomName: str):
+def get_room_object(roomName: str):
   for room in bridge.groups:
     if roomName == room.name:
       return room
   return None
 
-mainroom = findRoom(settings.MAIN_ROOM)
+mainroom = find_room_id(settings.MAIN_ROOM)
 
 for sceneID, scene in bridge.get_api()["scenes"].items():
   if scene["recycle"] == False and scene.get("group") == str(mainroom):
@@ -73,7 +73,7 @@ class Room:
     def lights(self) -> typing.List[Light]:
         return self._lights
 
-def getRooms() -> typing.List[Room]:
+def get_rooms() -> typing.List[Room]:
 
     api = current_api()
 
@@ -100,16 +100,16 @@ def set_scene(scene_id: int) -> None:
 
 def darken() -> None:
   """darken lights in room"""
-  room = getRoom(settings.MAIN_ROOM)
+  room = get_room_object(settings.MAIN_ROOM)
   room.brightness = max(room.brightness - settings.BRIGHTNESS_STEP, 0)
 
 def lighten() -> None:
   """brighten lights in room"""
-  room = getRoom(settings.MAIN_ROOM)
+  room = get_room_object(settings.MAIN_ROOM)
   room.brightness = min(room.brightness + settings.BRIGHTNESS_STEP, 255)
 
 def toggle() -> None:
   """toggle room on/off"""
-  room = getRoom(settings.MAIN_ROOM)
+  room = get_room_object(settings.MAIN_ROOM)
   room.on = not room.on
 
