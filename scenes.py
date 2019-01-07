@@ -1,9 +1,9 @@
-import lights, settings
+import lights, settings, state
 
 scenes = sorted(list(lights.scenes.items()), key=lambda s: s[1]["name"])
 sceneNames = [scene.get("name") for sceneID, scene in scenes]
 sceneIdx = 0
-sceneFav = settings.FAVE_SCENES
+sceneFav = state.FAVE_SCENES
 
 def is_fave(idx: int) -> bool:
   return sceneNames[idx] in sceneFav
@@ -34,7 +34,8 @@ def toggle_fav() -> None:
   if name in sceneFav:
     sceneFav.remove(name)
   else:
-    sceneFav.append(name)  
+    sceneFav.append(name)
+  state.save_state()
 
 def prev_fav() -> None:
   """go to the previous favorite scene"""
