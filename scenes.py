@@ -5,13 +5,13 @@ sceneNames = [scene.get("name") for sceneID, scene in scenes]
 sceneIdx = 0
 sceneFav = settings.FAVE_SCENES
 
-def is_fave(idx):
+def is_fave(idx: int) -> bool:
   return sceneNames[idx] in sceneFav
  
-def current_scene():
+def current_scene() -> str:
   return sceneNames[sceneIdx]
 
-def prev_scene():
+def prev_scene() -> None:
   """select the previous scene"""
 
   global sceneIdx
@@ -19,7 +19,7 @@ def prev_scene():
   sceneIdx %= len(scenes)  
   lights.set_scene(scenes[sceneIdx][0])
 
-def next_scene():
+def next_scene() -> None:
   """select the next scene"""
 
   global sceneIdx
@@ -27,7 +27,7 @@ def next_scene():
   sceneIdx %= len(scenes)  
   lights.set_scene(scenes[sceneIdx][0])
 
-def toggle_fav():
+def toggle_fav() -> None:
   """toggle last selected scene as favorite"""
   
   name = sceneNames[sceneIdx]
@@ -36,7 +36,7 @@ def toggle_fav():
   else:
     sceneFav.append(name)  
 
-def prev_fav():
+def prev_fav() -> None:
   """go to the previous favorite scene"""
   
   global sceneIdx
@@ -50,7 +50,7 @@ def prev_fav():
       return
   lights.set_scene(scenes[sceneIdx][0])
 
-def next_fav():
+def next_fav() -> None:
   """go to the next favorite scene"""
   
   global sceneIdx
@@ -65,13 +65,13 @@ def next_fav():
   lights.set_scene(scenes[sceneIdx][0])
 
 
-def reset_scene():
+def reset_scene() -> None:
   """reset scene to last selected"""
 
   global sceneIdx
   lights.set_scene(scenes[sceneIdx][0])
 
-def set_scene(sceneName):
+def set_scene(sceneName: str) -> None:
   global sceneIdx
   try:
     idx = sceneNames.index(sceneName)
@@ -80,7 +80,7 @@ def set_scene(sceneName):
   except ValueError as e:
     pass
 
-def set_starting(first_char):
+def set_starting(first_char: int) -> None:
   for name in sceneNames[sceneIdx+1:] + sceneNames[0:sceneIdx]:
     ch = ord(name.lower()[0])
     if ch == first_char:

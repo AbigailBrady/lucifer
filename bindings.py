@@ -1,28 +1,29 @@
 import curses, lights, scenes, sys, settings
 
-def set_dark():
-  """set current scene as dark scene"""
-  settings.set_dark(scenes.current_scene())
+class RecallPreset:
+    def __init__(self, preset: int) -> None:
+        self._preset = preset
 
-def set_bright():
-  """set current scene as bright scene"""
-  settings.set_bright(scenes.current_scene())
+    @property
+    def scene(self) -> str:
+        return settings.get_preset(self._preset)
 
-class SceneSetter:
-  def __init__(self, getter):
-    self._getter = getter
+    def __call__(self) -> None:
+        newScene = self.scene
+        if newScene is not None:
+            scenes.set_scene(newScene)
 
-  @property
-  def scene(self):
-    return self._getter()
+class MarkPreset:
+    def __init__(self, preset: int) -> None:
+        self._preset = preset
 
-  def __call__(self):
-    scenes.set_scene(self._getter())
+    def __call__(self) -> None:
+        settings.mark_preset(self._preset, scenes.current_scene())
 
 BINDINGS = { 27: lambda: sys.exit(0),
 
-             curses.KEY_HOME : SceneSetter(settings.get_dark),
-             ord('i') : SceneSetter(settings.get_bright),
+             curses.KEY_HOME : RecallPreset(1),
+             ord('i') : RecallPreset(2),
 
 	     curses.KEY_DOWN: scenes.next_scene,
              curses.KEY_UP: scenes.prev_scene,
@@ -30,8 +31,8 @@ BINDINGS = { 27: lambda: sys.exit(0),
              curses.KEY_PPAGE: scenes.reset_scene, 
              ord('*'): scenes.toggle_fav,
 
-             49: set_dark,
-             50: set_bright,
+             49: MarkPreset(1),
+             50: MarkPreset(2),
              ord('-'): lights.darken,
              ord('='): lights.lighten,
              curses.KEY_LEFT: scenes.prev_fav,

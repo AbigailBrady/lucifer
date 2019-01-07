@@ -1,19 +1,22 @@
 import phue
 import settings
+import typing
 
 bridge = phue.Bridge(settings.BRIDGE_IP)
 
 scenes = {}
 
-def findRoom(roomName):
+def findRoom(roomName: str) -> typing.Optional[int]:
   for room in bridge.groups:
     if roomName == room.name:
       return room.group_id
+  return None
 
-def getRoom(roomName):
+def getRoom(roomName: str):
   for room in bridge.groups:
     if roomName == room.name:
       return room
+  return None
 
 mainroom = findRoom(settings.MAIN_ROOM)
 
@@ -21,92 +24,91 @@ for sceneID, scene in bridge.get_api()["scenes"].items():
   if scene["recycle"] == False and scene.get("group") == str(mainroom):
     scenes[sceneID] = scene
 
-def current_api():
+def current_api() -> dict:
   return bridge.get_api()
 
-class Room:
-  def __init__(self, id, name, lights):
-    self._id = int(id)
-    self._name = name
-    self._lights = lights
-
-  @property
-  def group_id(self):
-    return self._id
- 
-  @property 
-  def name(self):
-    return self._name
-  
-  @property 
-  def lights(self):
-    return self._lights
-
 class Light:
-  def __init__(self, api):
-    self._name = api["name"]
-    self._on = api["state"]["on"]
-    self._brightness = api["state"]["bri"]
-    self._saturation = api["state"]["sat"]
-    self._hue = api["state"]["hue"]
+    def __init__(self, api: dict):
+        self._name: str = api["name"]
+        self._on: bool = api["state"]["on"]
+        self._brightness: int = api["state"]["bri"]
+        self._saturation: int = api["state"]["sat"]
+        self._hue: int = api["state"]["hue"]
 
-  @property
-  def on(self):
-    return self._on
+    @property
+    def on(self):
+        return self._on
 
-  @property
-  def brightness(self):
-    return self._brightness
-  
-  @property
-  def hue(self):
-    return self._hue
-  
-  @property
-  def saturation(self):
-    return self._saturation
-  
-  @property
-  def name(self):
-    return self._name
+    @property
+    def brightness(self) -> int:
+        return self._brightness
 
+    @property
+    def hue(self) -> int:
+        return self._hue
 
-def getRooms():
+    @property
+    def saturation(self) -> int:
+        return self._saturation
 
-  api = current_api()
+    @property
+    def name(self) -> str:
+        return self._name
 
-  rooms = []
- 
-  groups = api["groups"]
-  for groupID, group in groups.items():
-     name = group["name"]
-     lights = group["lights"]
-     if "Entertainment area" not in name:
-       roomlights = []
-       for lightID in lights:
-          light = api["lights"][lightID]
-          roomlights.append(Light(light))
+class Room:
+    def __init__(self, group_id: typing.Any, name: str, lights: typing.List[Light]) -> None:
+        self._id = int(group_id)
+        self._name = str(name)
+        self._lights = lights
 
-       rooms.append(Room(groupID, name, roomlights))
+    @property
+    def group_id(self) -> int:
+        return self._id
 
-  rooms = sorted(rooms, key=lambda room: room.name)
+    @property 
+    def name(self) -> str:
+        return self._name
 
-  return rooms
+    @property 
+    def lights(self) -> typing.List[Light]:
+        return self._lights
 
-def set_scene(scene_id):
+def getRooms() -> typing.List[Room]:
+
+    api = current_api()
+
+    rooms: typing.List[Room] = []
+
+    groups = api["groups"]
+    for groupID, group in groups.items():
+        name = group["name"]
+        lights = group["lights"]
+        if "Entertainment area" not in name:
+            roomlights = []
+            for lightID in lights:
+                light = api["lights"][lightID]
+                roomlights.append(Light(light))
+
+        rooms.append(Room(groupID, name, roomlights))
+
+    rooms = sorted(rooms, key=lambda room: room.name)
+
+    return rooms
+
+def set_scene(scene_id: int) -> None:
   bridge.activate_scene(group_id=mainroom, scene_id=scene_id) 
 
-def darken():
+def darken() -> None:
   """darken lights in room"""
   room = getRoom(settings.MAIN_ROOM)
   room.brightness = max(room.brightness - settings.BRIGHTNESS_STEP, 0)
 
-def lighten():
+def lighten() -> None:
   """brighten lights in room"""
   room = getRoom(settings.MAIN_ROOM)
   room.brightness = min(room.brightness + settings.BRIGHTNESS_STEP, 255)
 
-def toggle():
+def toggle() -> None:
   """toggle room on/off"""
   room = getRoom(settings.MAIN_ROOM)
   room.on = not room.on
