@@ -8,6 +8,73 @@ sceneFav = state.FAVE_SCENES
 def is_fave(idx: int) -> bool:
   return sceneNames[idx] in sceneFav
  
+def is_similar(a, b):
+    for a_v, b_v in zip(a, b):
+        if abs(a_v - b_v) > settings.XY_MATCH_THRESHOLD:
+            return False
+    return True
+
+cached_scene_descs = {}
+
+def get_scene_desc(scene_id):
+    if scene_id in cached_scene_descs:
+        return cached_scene_descs[scene_id]
+    desc = lights.bridge.request('GET', '/api/' + lights.bridge.username + '/scenes/' + scene_id)
+    cached_scene_descs[scene_id] = desc
+    return desc
+
+def guess_activated_scene(rooms: list = None):
+    
+    if rooms is None:
+        rooms = lights.get_rooms()
+
+    sceneIDs = [scene[0] for scene in scenes]
+
+    cands = []
+
+    for idx, sceneid in enumerate(sceneIDs):
+
+        desc = get_scene_desc(sceneid)
+        
+        match = True
+
+        for light in rooms.main.lights:
+            
+            scene_bright = desc["lightstates"][light.id]["bri"]
+            light_bright = light.brightness
+            
+            if scene_bright != light_bright:
+                break
+            
+            scene_temp = desc["lightstates"][light.id].get("ct")
+            light_temp = light.ct
+            
+            if scene_temp is not None and scene_temp != light_temp:
+                break
+            
+            scene_xy = desc["lightstates"][light.id].get("xy")
+            light_xy = light.xy
+            
+            if scene_xy is not None and not is_similar(scene_xy, light_xy):
+                break
+            
+
+        else:
+
+            if idx == sceneIdx:
+                return idx
+
+            cands.append(idx)
+
+    for idx, cand in enumerate(cands):
+        if is_fave(idx):
+            return idx
+
+    if len(cands):
+        return cands[0]
+
+    return None
+    
 def current_scene() -> str:
   return sceneNames[sceneIdx]
 
@@ -87,4 +154,6 @@ def set_starting(first_char: int) -> None:
     if ch == first_char:
       set_scene(name)
       return
+
+sceneIdx = guess_activated_scene() or 0
 

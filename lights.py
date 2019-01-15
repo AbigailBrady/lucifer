@@ -2,6 +2,8 @@ import phue
 import settings
 import typing
 
+from pprint import pprint
+
 bridge = phue.Bridge(settings.BRIDGE_IP)
 
 scenes = {}
@@ -28,13 +30,18 @@ def current_api() -> dict:
   return bridge.get_api()
 
 class Light:
-    def __init__(self, api: dict):
+    def __init__(self, lightID: str, api: dict):
+        self._id = lightID
         self._name = api["name"]
         self._on = api["state"]["on"]
         self._brightness = api["state"]["bri"]
-        self._saturation = api["state"]["sat"]
-        self._hue = api["state"]["hue"]
+        self._xy = api["state"].get("xy")
+        self._ct = api["state"].get("ct")
 
+    @property
+    def id(self):
+        return self._id
+    
     @property
     def on(self):
         return self._on
@@ -44,12 +51,12 @@ class Light:
         return self._brightness
 
     @property
-    def hue(self) -> int:
-        return self._hue
-
+    def ct(self) -> float:
+        return self._ct
+    
     @property
-    def saturation(self) -> int:
-        return self._saturation
+    def xy(self) -> list:
+        return self._xy
 
     @property
     def name(self) -> str:
@@ -73,7 +80,21 @@ class Room:
     def lights(self) -> typing.List[Light]:
         return self._lights
 
-def get_rooms() -> typing.List[Room]:
+class Rooms:
+    def __init__(self, rooms: list) -> None:
+        self.rooms = sorted(rooms, key=lambda room: room.name)
+
+    @property
+    def main(self) -> Room:
+        for room in self.rooms:
+            if room.group_id == mainroom:
+                return room
+        return None
+
+    def __iter__(self):
+        yield from self.rooms
+
+def get_rooms() -> Rooms:
 
     api = current_api()
 
@@ -87,13 +108,12 @@ def get_rooms() -> typing.List[Room]:
             roomlights = []
             for lightID in lights:
                 light = api["lights"][lightID]
-                roomlights.append(Light(light))
+                roomlights.append(Light(lightID, light))
 
             rooms.append(Room(groupID, name, roomlights))
 
-    rooms = sorted(rooms, key=lambda room: room.name)
+    return Rooms(rooms)
 
-    return rooms
 
 def set_scene(scene_id: int) -> None:
   bridge.activate_scene(group_id=mainroom, scene_id=scene_id) 
@@ -107,6 +127,16 @@ def lighten() -> None:
   """brighten lights in room"""
   room = get_room_object(settings.MAIN_ROOM)
   room.brightness = min(room.brightness + settings.BRIGHTNESS_STEP, 255)
+
+def dimmest() -> None:
+  """put lights as dark as they will go (while still On)"""
+  room = get_room_object(settings.MAIN_ROOM)
+  room.brightness = 0
+
+def brightest() -> None:
+  """put lights as bright as they will go"""
+  room = get_room_object(settings.MAIN_ROOM)
+  room.brightness = 255
 
 def toggle() -> None:
   """toggle room on/off"""

@@ -13,9 +13,12 @@ def bright(value: int) -> str:
     value = round(value * 100 / 255)
     return pad(str(value) + "%", 4)
 
+def xy(value: tuple) -> str:
+    return "[{0:.2f}, {1:.2f}]".format(value[0], value[1])
+
 def describe_light(light: lights.Light) -> str:
     if light.on:
-        return pad(light.name, 20) + " b: " + bright(light.brightness)
+        return pad(light.name, 20) + " b: " + bright(light.brightness) + " " + xy(light.xy)
 
       # hue and saturation don't seem to update quickly enough ?
       # + " h: " + pad(light.hue, 5) + " s: " + pad(light.saturation, 3)
@@ -32,11 +35,17 @@ def paint() -> None:
     if stdscr is None:
         return
     global lastKey
+
+    rooms = lights.get_rooms()
+
+    guess = scenes.guess_activated_scene(rooms)
+    if guess is not None:
+        scenes.sceneIdx = guess
     
     stdscr.clear()
     stdscr.addstr(0, 0, str(lastKey))
     row = 2
-    for room in lights.get_rooms():
+    for room in rooms:
         stdscr.addstr(row, 2, room.name, curses.A_REVERSE if room.group_id == lights.mainroom else 0)
         row += 1
         for light in room.lights: 
@@ -44,6 +53,7 @@ def paint() -> None:
             row += 1
 
     row += 1
+    first_scene_row = row
 
     for idx, sceneName in enumerate(scenes.sceneNames):
         stdscr.addstr(row, 0, "*" if scenes.is_fave(idx) else "")
@@ -51,7 +61,7 @@ def paint() -> None:
         stdscr.addstr(row, 25, key_for(sceneName))
         row += 1
 
-    row = 5
+    row = first_scene_row
 
     for key, binding in bindings.BINDINGS.items():
         if not isinstance(binding, (str, presets.RecallPreset)):
