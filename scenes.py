@@ -23,7 +23,7 @@ def get_scene_desc(scene_id):
     cached_scene_descs[scene_id] = desc
     return desc
 
-def guess_activated_scene(rooms: list = None):
+def guess_activated_scene(rooms: list = None, take_a_stab: bool = False):
     
     if rooms is None:
         rooms = lights.get_rooms()
@@ -61,16 +61,21 @@ def guess_activated_scene(rooms: list = None):
 
         else:
 
-            if idx == sceneIdx:
-                return idx
+            if take_a_stab:
+                if idx == sceneIdx:
+                    return idx
 
             cands.append(idx)
 
-    for idx, cand in enumerate(cands):
-        if is_fave(idx):
-            return idx
+    if take_a_stab:
+        for idx, cand in enumerate(cands):
+            if is_fave(idx):
+                return idx
 
-    if len(cands):
+    if cands != [] and take_a_stab:
+        return cands[0]
+
+    if len(cands) == 1:
         return cands[0]
 
     return None
@@ -155,5 +160,5 @@ def set_starting(first_char: int) -> None:
       set_scene(name)
       return
 
-sceneIdx = guess_activated_scene() or 0
+sceneIdx = guess_activated_scene(take_a_stab = True) or 0
 
