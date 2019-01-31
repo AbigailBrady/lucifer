@@ -42,7 +42,7 @@ def paint() -> None:
     if guess is not None:
         scenes.sceneIdx = guess
     
-    stdscr.clear()
+    stdscr.erase()
     stdscr.addstr(0, 0, str(lastKey))
     row = 2
     for room in rooms:
